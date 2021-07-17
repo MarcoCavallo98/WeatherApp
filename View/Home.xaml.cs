@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,14 +14,13 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace WeatherApp
-
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Logica di interazione per Home.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Home : UserControl
     {
-        public MainWindow()
+        public Home()
         {
             InitializeComponent();
         }
