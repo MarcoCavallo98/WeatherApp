@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
 using System.Net.Http;
+using System.Diagnostics;
+using System.Globalization;
 
-namespace WeatherApp.Model
+namespace WeatherApp
 {
     sealed class WeatherMapManager
     {
+        #region fields
+
         private string PATH = "./Resource/WeatherMapConfig.json";
 
         private string APIKey;
@@ -18,6 +22,26 @@ namespace WeatherApp.Model
         private static WeatherMapManager manager;
 
         private HttpClient cl = new HttpClient();
+
+        private Dictionary<string, List<CityWeather>> _citiesWeather;
+
+        #endregion
+
+        #region properties
+        public Dictionary<string, List<CityWeather>> CitiesWeather 
+        {
+            get 
+            {
+                if (_citiesWeather == null)
+                    _citiesWeather = new Dictionary<string, List<CityWeather>>();
+
+                return _citiesWeather;
+            }
+        }
+
+        #endregion
+
+        #region methods
 
         private WeatherMapManager()
         {
@@ -41,29 +65,50 @@ namespace WeatherApp.Model
             return manager;
         }
 
-        public async Task<string> GetCityWeather(string CityName, bool FiveDays) 
+        public async Task<Status> GetCityWeather(string CityName) 
         {
-            await ApplyConfig();
-            Uri url;
-            url = FiveDays == true ? Uris.FiveDays(CityName, APIKey) : Uris.CurrenTime(CityName, APIKey);
+            if(APIKey == null)
+                await ApplyConfig();
+
+            Uri url = new Uri($"http://api.openweathermap.org/data/2.5/forecast?q={CityName}&appid={APIKey}");
             HttpResponseMessage res = await cl.GetAsync(url);
-            string body = await res.Content.ReadAsStringAsync();
-            return body;
-        }
 
-        private static class Uris 
-        { 
-            public static Uri CurrenTime(string CityName, string APIKey) 
+            if (res.StatusCode != System.Net.HttpStatusCode.OK)
+                return new Status(res.StatusCode, "An error has occurred.\nPlease try again.");
+
+            JsonElement data = await JsonSerializer.DeserializeAsync<JsonElement>(res.Content.ReadAsStream());
+            JsonElement list = data.GetProperty("list");
+            List<CityWeather> cwList = new List<CityWeather>();
+            NumberFormatInfo provider = new NumberFormatInfo();
+            provider.NumberDecimalSeparator = ".";
+            for (int i = 0; i < list.GetArrayLength(); i++)
             {
-                Uri url = new Uri($"http://api.openweathermap.org/data/2.5/weather?q={CityName}&appid={APIKey}");
-                return url;
+                string dt = list[i].GetProperty("dt_txt").ToString();
+                double tempMin = Convert.ToDouble(list[i].GetProperty("main").GetProperty("temp_min").ToString(), provider);
+                double tempMax = Convert.ToDouble(list[i].GetProperty("main").GetProperty("temp_max").ToString(), provider);
+                double humidity = Convert.ToDouble(list[i].GetProperty("main").GetProperty("humidity").ToString(), provider);
+                string weather = list[i].GetProperty("weather")[0].GetProperty("description").ToString();
+                double windSpeed = Convert.ToDouble(list[i].GetProperty("wind").GetProperty("speed").ToString(), provider);
+                string icon = list[i].GetProperty("weather")[0].GetProperty("icon").ToString();
+                CityWeather cw = new CityWeather
+                {
+                    Dt = dt,
+                    TempMin = tempMin,
+                    TempMax = tempMax,
+                    Humidity = humidity,
+                    Weather = weather,
+                    WindSpeed = windSpeed,
+                    Icon = icon
+                };
+
+                cwList.Add(cw);
             }
 
-            public static Uri FiveDays(string CityName, string APIKey) 
-            {
-                Uri url = new Uri($"http://api.openweathermap.org/data/2.5/forecast?q={CityName}&appid={APIKey}");
-                return url;
-            }
+            CitiesWeather.Add(CityName, cwList);
+
+            return new Status(res.StatusCode, res.ReasonPhrase);
         }
+
+        #endregion
     }
 }

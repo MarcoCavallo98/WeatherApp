@@ -22,6 +22,8 @@ namespace WeatherApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        private DBManager db = DBManager.getIstance();
+        private WeatherMapManager wm = WeatherMapManager.getInstance();
         public MainWindow()
         {
             InitializeComponent();

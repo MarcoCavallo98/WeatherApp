@@ -10,29 +10,27 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace WeatherApp
 {
     /// <summary>
-    /// Logica di interazione per Home.xaml
+    /// Logica di interazione per Loading.xaml
     /// </summary>
-    public partial class Home : UserControl
+    public partial class Loading : Window
     {
-        public Home()
+        public Loading()
         {
             InitializeComponent();
+            LoadingViewModel context = new LoadingViewModel();
+            context.ErrorHandler += ErrorHandler;
+            this.DataContext = context;
         }
 
-        private void Back_Click(object sender, RoutedEventArgs e)
+        public void ErrorHandler(object sender, string args) 
         {
-            ((HomeViewModel)this.DataContext).DecrementWeatherPositionCounter();
-        }
-
-        private void Forward_Click(object sender, RoutedEventArgs e)
-        {
-            ((HomeViewModel)this.DataContext).IncrementWeatherPositionCounter();
+            MessageBoxResult msgRes = MessageBox.Show(args, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Application.Current.Shutdown();
         }
     }
 }

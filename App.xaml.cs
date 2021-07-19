@@ -13,13 +13,32 @@ namespace WeatherApp
     /// </summary>
     public partial class App : Application
     {
+        private Loading start;
+        LoadingViewModel context;
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            MainWindow mw = new MainWindow();
-            mw.DataContext = new MainViewModel();
-            mw.Show();
+            
+            start = new Loading();
+            context = (LoadingViewModel)start.DataContext;
+            context.PropertyChanged += Loaded;
+            start.DataContext = context;
+            start.Show();
+
+        }
+
+        private void Loaded(object sender, EventArgs args) 
+        {
+            if (context.LoadingString.Equals("Done"))
+            {
+                MainWindow mw = new MainWindow();
+                this.MainWindow = mw;
+                mw.DataContext = new MainViewModel();
+                
+                start.Close();
+                mw.Show();
+            }
         }
         
     }

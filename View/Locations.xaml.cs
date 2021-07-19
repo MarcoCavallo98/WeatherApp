@@ -23,6 +23,7 @@ namespace WeatherApp
         public Locations()
         {
             InitializeComponent();
+            this.DataContext = new LocationsViewModel();
         }
     }
 }

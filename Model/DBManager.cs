@@ -7,8 +7,9 @@ using System.Data.SQLite;
 using System.IO;
 using System.Text.Json;
 using System.Diagnostics;
+using System.Data.Common;
 
-namespace WeatherApp.Model
+namespace WeatherApp
 {
     class DBManager
     {
@@ -21,10 +22,25 @@ namespace WeatherApp.Model
 
         private static DBManager manager;
 
+        private IList<FavPlaces> _locations;
+
+
+        public IList<FavPlaces> Locations 
+        {
+            get
+            {
+                if (_locations == null)
+                {
+                    _locations = new List<FavPlaces>();
+                }
+                return _locations;
+            }
+        }
+
         private DBManager() { }
 
 
-        public async void CreateDB() 
+        public async Task CreateDB()
         {
             if (DBPath == null)
                 await ApplyConfig();
@@ -34,7 +50,7 @@ namespace WeatherApp.Model
                 try
                 {
                     SQLiteConnection.CreateFile(DBPath);
-                    DBConnect();
+                    await DBConnect();
                     SQLiteCommand command = conn.CreateCommand();
                     command.CommandText = @"
                                             CREATE TABLE Cities(
@@ -43,15 +59,23 @@ namespace WeatherApp.Model
                                             );
                                        ";
                     await command.ExecuteNonQueryAsync();
+
+                    string[] cities = { "London", "Rome", "Berlin", "Paris" };
+
+                    foreach (string c in cities)
+                    {
+                        command.CommandText = $"INSERT INTO Cities (name) VALUES ('{c}');";
+                        await command.ExecuteNonQueryAsync();
+                    }
                 }
-                catch (Exception e) 
+                catch (Exception e)
                 {
                     throw;
                 }
             }
         }
 
-        public async void DBConnect() 
+        public async Task DBConnect()
         {
             if (DBPath == null)
                 await ApplyConfig();
@@ -63,14 +87,14 @@ namespace WeatherApp.Model
                     conn = new SQLiteConnection($"Data Source={DBPath};");
                     conn.Open();
                 }
-                catch (Exception e) 
+                catch (Exception e)
                 {
                     throw;
                 }
             }
         }
 
-        private async Task ApplyConfig() 
+        private async Task ApplyConfig()
         {
             FileStream fs = File.OpenRead(PATH);
             JsonElement data = await JsonSerializer.DeserializeAsync<JsonElement>(fs);
@@ -79,12 +103,26 @@ namespace WeatherApp.Model
             DBPath = $"./{path}/{name}.db";
         }
 
-        public static DBManager getIstance() 
+        public static DBManager getIstance()
         {
             if (manager == null)
                 manager = new DBManager();
 
             return manager;
+        }
+
+        public async Task LoadFavPlaces() 
+        {
+            SQLiteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT * FROM Cities;";
+            DbDataReader reader = await cmd.ExecuteReaderAsync();
+
+            while (reader.Read()) 
+            {
+                FavPlaces to_add = new FavPlaces { ID = reader.GetInt32(0), Name = reader.GetString(1) };
+                Locations.Add(to_add);
+            }
+
         }
 
     }
