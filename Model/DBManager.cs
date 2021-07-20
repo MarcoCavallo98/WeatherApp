@@ -132,11 +132,13 @@ namespace WeatherApp
         {
             //Setup configurations
 
-            FileStream fs = File.OpenRead(PATH);
-            JsonElement data = await JsonSerializer.DeserializeAsync<JsonElement>(fs);
-            string name = data.GetProperty("DBName").ToString().Trim();
-            string path = data.GetProperty("DBPath").ToString().Trim();
-            DBPath = $"./{path}/{name}.db";
+            using (FileStream fs = File.OpenRead(PATH))
+            {
+                JsonElement data = await JsonSerializer.DeserializeAsync<JsonElement>(fs);
+                string name = data.GetProperty("DBName").ToString().Trim();
+                string path = data.GetProperty("DBPath").ToString().Trim();
+                DBPath = $"./{path}/{name}.db";
+            }
         }
 
         public static DBManager getIstance()

@@ -111,8 +111,11 @@ namespace WeatherApp
                 if (manager.Locations.Count > 1)
                 {
                     FavPlaces place = (FavPlaces)parameter;
-                    WeatherMapManager.getInstance().CitiesWeather.Remove(place.Name); 
-                    await manager.RemoveFavPlaces(place); //This emit the LocationRemoved event
+                    if (place != null)
+                    {
+                        WeatherMapManager.getInstance().CitiesWeather.Remove(place.Name);
+                        await manager.RemoveFavPlaces(place); //This emit the LocationRemoved event
+                    }
                 }
             }
         }
