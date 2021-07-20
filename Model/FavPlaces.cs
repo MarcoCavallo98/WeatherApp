@@ -10,14 +10,12 @@ namespace WeatherApp
     {
         #region fields
 
-        private int _id;
         private string _name;
 
         #endregion
 
         #region properties
 
-        public int ID { get; set; }
         public string Name { get; set; }
 
         #endregion

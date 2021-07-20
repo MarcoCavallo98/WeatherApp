@@ -42,9 +42,16 @@ namespace WeatherApp
 
             foreach (FavPlaces fp in db.Locations)
             {
-                Status res = await wm.GetCityWeather(fp.Name);
-                if (res.code != System.Net.HttpStatusCode.OK)
-                    OnErrorOccurred(res.message);
+                try
+                {
+                    Status res = await wm.GetCityWeather(fp.Name);
+                    if (res.code != System.Net.HttpStatusCode.OK)
+                        OnErrorOccurred(res.message);
+                }
+                catch (Exception) 
+                {
+                    OnErrorOccurred("Please, check your connection!");
+                }
             }
 
             LoadingString = "Done";

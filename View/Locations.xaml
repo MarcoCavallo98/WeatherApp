@@ -11,16 +11,21 @@
             <RowDefinition/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <ListView Grid.Row="0" ItemsSource="{Binding LocationsList}" Margin="10,10,10,10">
+        <ListView Grid.Row="0" Name="cities" ItemsSource="{Binding LocationsList}" Margin="10,10,10,10">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock FontSize="16" Text="{Binding Name}" Margin="10,10,0,0"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" FlowDirection="RightToLeft">
-            <Button Content="Remove" Margin="10,0,0,10" Padding="5"/>
-            <Button Content="Add" Margin="10,0,0,10" Padding="5"/>
+        <StackPanel Grid.Row="1" Orientation="Vertical" FlowDirection="LeftToRight">
+            <Button Content="Remove" Margin="10,0,0,0" 
+                    Padding="5" Command="{Binding RemoveLocation }"
+                    CommandParameter="{Binding ElementName=cities, Path=SelectedItem}" Width="70"/>
+            <TextBox Name="newLocation" Margin="10,10,10,10" Width="300"/>
+            <Button Content="Add" Margin="10,0,0,10" Padding="5"
+                    Command="{Binding AddLocation }" 
+                    CommandParameter="{Binding ElementName=newLocation, Path=Text}" Width="70"/>
         </StackPanel>
     </Grid>
 </UserControl>

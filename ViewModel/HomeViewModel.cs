@@ -100,6 +100,8 @@ namespace WeatherApp
 
         public HomeViewModel() 
         {
+            db.LocationRemoved += HandleLocationRemoved;
+            db.LocationAdded += HandleLocationAdded;
             WeatherPositionCounter = 0;
             CurrentLocation = LocationsList[0];
         }
@@ -125,6 +127,23 @@ namespace WeatherApp
             PropertyChangedEventHandler copy = PropertyChanged;
             if (copy != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void HandleLocationRemoved(object sender, FavPlaces args) 
+        {
+            if (args != null) 
+            {
+                LocationsList.Remove(args);
+                CurrentLocation = LocationsList[0];
+            }
+        }
+
+        private void HandleLocationAdded(object sender, FavPlaces args)
+        {
+            if (args != null)
+            {
+                LocationsList.Add(args);
+            }
         }
 
         #endregion

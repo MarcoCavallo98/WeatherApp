@@ -25,5 +25,6 @@ namespace WeatherApp
             InitializeComponent();
             this.DataContext = new LocationsViewModel();
         }
+
     }
 }

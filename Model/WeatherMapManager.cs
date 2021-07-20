@@ -69,18 +69,36 @@ namespace WeatherApp
         {
             if(APIKey == null)
                 await ApplyConfig();
+            try
+            {
+                Uri url = new Uri($"http://api.openweathermap.org/data/2.5/forecast?q={CityName}&appid={APIKey}");
+                HttpResponseMessage res = await cl.GetAsync(url);
 
-            Uri url = new Uri($"http://api.openweathermap.org/data/2.5/forecast?q={CityName}&appid={APIKey}");
-            HttpResponseMessage res = await cl.GetAsync(url);
 
-            if (res.StatusCode != System.Net.HttpStatusCode.OK)
-                return new Status(res.StatusCode, "An error has occurred.\nPlease try again.");
 
-            JsonElement data = await JsonSerializer.DeserializeAsync<JsonElement>(res.Content.ReadAsStream());
-            JsonElement list = data.GetProperty("list");
+                if (res.StatusCode != System.Net.HttpStatusCode.OK)
+                    return new Status(res.StatusCode, "An error has occurred.\nPlease try again.");
+
+                JsonElement data = await JsonSerializer.DeserializeAsync<JsonElement>(res.Content.ReadAsStream());
+                JsonElement list = data.GetProperty("list");
+                List<CityWeather> cwList = CityWeatherCreator(list);
+
+                CitiesWeather.Add(CityName, cwList);
+
+                return new Status(res.StatusCode, res.ReasonPhrase);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private List<CityWeather> CityWeatherCreator(JsonElement list) 
+        {
             List<CityWeather> cwList = new List<CityWeather>();
             NumberFormatInfo provider = new NumberFormatInfo();
             provider.NumberDecimalSeparator = ".";
+
             for (int i = 0; i < list.GetArrayLength(); i++)
             {
                 string dt = list[i].GetProperty("dt_txt").ToString();
@@ -104,9 +122,7 @@ namespace WeatherApp
                 cwList.Add(cw);
             }
 
-            CitiesWeather.Add(CityName, cwList);
-
-            return new Status(res.StatusCode, res.ReasonPhrase);
+            return cwList;
         }
 
         #endregion
