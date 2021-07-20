@@ -8,6 +8,8 @@ namespace WeatherApp
 {
     struct Status
     {
+        //Struct for HTTP code and message response
+
         public System.Net.HttpStatusCode code;
         public string message;
 

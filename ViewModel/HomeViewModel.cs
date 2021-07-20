@@ -17,8 +17,8 @@ namespace WeatherApp
         private DBManager db = DBManager.getIstance();
         private WeatherMapManager wm = WeatherMapManager.getInstance();
 
-        private int WeatherPositionCounter;
-        private bool _canIncrementWeatherPositionCounter;
+        private int WeatherPositionCounter; //Counter for displaying the diffent weather informations about a city
+        private bool _canIncrementWeatherPositionCounter; 
         private bool _canDecrementWeatherPositionCounter;
 
         private ObservableCollection<FavPlaces> _locations;
@@ -76,7 +76,7 @@ namespace WeatherApp
             set 
             {
                 _currentLocation = value;
-                WeatherPositionCounter = 0;
+                WeatherPositionCounter = 0; //Reset counter
                 CanIncrementWeatherPositionCounter = wm.CitiesWeather[CurrentLocation.Name].Count > WeatherPositionCounter+1;
                 CanDecrementWeatherPositionCounter = WeatherPositionCounter > 0;
                 CurrentWeather = wm.CitiesWeather[value.Name][WeatherPositionCounter];
@@ -100,6 +100,7 @@ namespace WeatherApp
 
         public HomeViewModel() 
         {
+            //Subscription to events
             db.LocationRemoved += HandleLocationRemoved;
             db.LocationAdded += HandleLocationAdded;
             WeatherPositionCounter = 0;

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace WeatherApp
 {
+
+    //This class represent a location
     class FavPlaces
     {
         #region fields

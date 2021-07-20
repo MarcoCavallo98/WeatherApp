@@ -14,6 +14,9 @@ namespace WeatherApp
 {
     class DBManager 
     {
+
+        //This singleton class handles all the requests to the local SQLite DB
+
         #region fileds
 
         private string PATH = "./Resource/WeatherMapConfig.json";
@@ -24,8 +27,9 @@ namespace WeatherApp
 
         private static DBManager manager;
 
-        private IList<FavPlaces> _locations;
+        private IList<FavPlaces> _locations; //Keep locations from DB
 
+        //Events to notify a change about the user's locations
         private event EventHandler<FavPlaces> _locationRemoved;
         private event EventHandler<FavPlaces> _locationAdded;
 
@@ -68,6 +72,8 @@ namespace WeatherApp
 
         public async Task CreateDB()
         {
+            //If DB doesn't exists then create it
+
             if (DBPath == null)
                 await ApplyConfig();
 
@@ -86,6 +92,7 @@ namespace WeatherApp
                                        ";
                     await command.ExecuteNonQueryAsync();
 
+                    //Some default cities
                     string[] cities = { "London", "Rome", "Berlin", "Paris" };
 
                     foreach (string c in cities)
@@ -123,6 +130,8 @@ namespace WeatherApp
 
         private async Task ApplyConfig()
         {
+            //Setup configurations
+
             FileStream fs = File.OpenRead(PATH);
             JsonElement data = await JsonSerializer.DeserializeAsync<JsonElement>(fs);
             string name = data.GetProperty("DBName").ToString().Trim();

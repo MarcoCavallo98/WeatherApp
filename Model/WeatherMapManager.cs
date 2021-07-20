@@ -13,6 +13,9 @@ namespace WeatherApp
 {
     sealed class WeatherMapManager
     {
+
+        //This singleton class handles all requests to API
+
         #region fields
 
         private string PATH = "./Resource/WeatherMapConfig.json";
@@ -23,7 +26,7 @@ namespace WeatherApp
 
         private HttpClient cl = new HttpClient();
 
-        private Dictionary<string, List<CityWeather>> _citiesWeather;
+        private Dictionary<string, List<CityWeather>> _citiesWeather; //Keep weather informations fetched
 
         #endregion
 
@@ -49,6 +52,8 @@ namespace WeatherApp
 
         private async Task ApplyConfig() 
         {
+            //Setup configuration
+
             if (APIKey == null)
             {
                 FileStream fs = File.OpenRead(PATH);
@@ -67,6 +72,8 @@ namespace WeatherApp
 
         public async Task<Status> GetCityWeather(string CityName) 
         {
+            //Get the weather for the specified city
+
             if(APIKey == null)
                 await ApplyConfig();
             try
@@ -89,7 +96,7 @@ namespace WeatherApp
             }
             catch (Exception)
             {
-                throw;
+                throw; //Maybe no connection
             }
         }
 

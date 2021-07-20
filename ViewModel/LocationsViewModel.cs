@@ -13,11 +13,11 @@ namespace WeatherApp
     class LocationsViewModel : IPageViewModel
     {
         #region fields
-        public string PageName => "Manage locations";
+        public string PageName => "Manage locations"; //Title of page
 
         private DBManager db = DBManager.getIstance();
 
-        private ObservableCollection<FavPlaces> _locations;
+        private ObservableCollection<FavPlaces> _locations; //Collection of all locations displayed
 
         private ICommand _removeLocation;
         private ICommand _addLocation;
@@ -69,10 +69,12 @@ namespace WeatherApp
 
         public LocationsViewModel() 
         {
+            //Registration to the events
             db.LocationRemoved += HandleLocationRemoved;
             db.LocationAdded += HandleLocationAdded;
         }
 
+        //Event handlers
         private void HandleLocationRemoved(object sender, FavPlaces args) 
         { 
             if(args != null) 
@@ -88,17 +90,20 @@ namespace WeatherApp
                 LocationsList.Add(args);
             }
         }
+        //End event handlers
         #endregion
 
         //COMMANDS
         private class DeleteCommand : ICommand
         {
+            //This command allow the user to remove a location from the SQLite DB 
+
             public event EventHandler CanExecuteChanged;
             private DBManager manager = DBManager.getIstance();
 
             public bool CanExecute(object parameter)
             {
-                return true;
+                return true; //Control will be done during Execute
             }
 
             public async void Execute(object parameter)
@@ -106,20 +111,22 @@ namespace WeatherApp
                 if (manager.Locations.Count > 1)
                 {
                     FavPlaces place = (FavPlaces)parameter;
-                    WeatherMapManager.getInstance().CitiesWeather.Remove(place.Name);
-                    await manager.RemoveFavPlaces(place);
+                    WeatherMapManager.getInstance().CitiesWeather.Remove(place.Name); 
+                    await manager.RemoveFavPlaces(place); //This emit the LocationRemoved event
                 }
             }
         }
 
         private class AddCommand : ICommand
         {
+            //This command allow the user to add a location to the SQLite DB
+
             public event EventHandler CanExecuteChanged;
             private DBManager manager = DBManager.getIstance();
 
             public bool CanExecute(object parameter)
             {
-                return true;
+                return true; 
             }
 
             public async void Execute(object parameter)
@@ -133,7 +140,7 @@ namespace WeatherApp
                         switch (res.code)
                         {
                             case System.Net.HttpStatusCode.OK:
-                                await manager.AddFavPlaces(place);
+                                await manager.AddFavPlaces(place); //This emit the LocationAdded event
                                 break;
                             case System.Net.HttpStatusCode.NotFound:
                                 MessageBox.Show("Unknown city", "Error", MessageBoxButton.OK, MessageBoxImage.Error);

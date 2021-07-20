@@ -11,6 +11,9 @@ namespace WeatherApp
 {
     class MainViewModel: INotifyPropertyChanged
     {
+
+        //This class handles all the page changes --> this let us to create a SPA
+
         #region fields
 
         private IPageViewModel _currentPageViewModel;

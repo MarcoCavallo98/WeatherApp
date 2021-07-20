@@ -14,7 +14,7 @@ namespace WeatherApp
         private string _loadingString;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler<string> ErrorHandler;
+        public event EventHandler<string> ErrorHandler; //Event for displaying message boxes
 
         public string LoadingString
         {

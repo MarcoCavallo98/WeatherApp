@@ -10,6 +10,8 @@ namespace WeatherApp
 {
     class CityWeather: INotifyPropertyChanged
     {
+
+        //This class collects all weather informations bout a city
         #region fields
 
         private string _dt;
